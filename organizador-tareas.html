@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow Pro - Gestión de Equipos</title>
+    
+    <!-- Scripts & Libs -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        surface: {
+                            50: '#f9fafb',
+                            100: '#f3f4f6',
+                            200: '#e5e7eb',
+                            300: '#d1d5db',
+                            400: '#9ca3af',
+                            500: '#6b7280',
+                            600: '#4b5563',
+                            700: '#374151',
+                            800: '#1f2937',
+                            900: '#111827',
+                            950: '#030712'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --sidebar-width: 280px;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(229, 231, 235, 0.5);
+        }
+
+        .dark {
+            --glass-bg: rgba(17, 24, 39, 0.7);
+            --glass-border: rgba(55, 65, 81, 0.5);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+            color: #111827;
+        }
+
+        .dark body {
+            background-color: #030712;
+            color: #f9fafb;
+        }
+
+        /* Glassmorphism utility */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+        }
+
+        /* Nav item refinement */
+        .nav-link {
+            @apply flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ease-in-out;
+        }
+        .nav-link.active {
+            @apply bg-brand-500/10 text-brand-600 dark:text-brand-400 font-semibold;
+            box-shadow: 0 0 0 1px rgba(14, 165, 233, 0.1);
+        }
+        .nav-link:not(.active) {
+            @apply text-surface-500 hover:text-surface-900 dark:hover:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-800/50;
+        }
+
+        /* Kanban styling */
+        .kanban-col {
+            min-height: calc(100vh - 250px);
+        }
+        .card-drag {
+            opacity: 0.4;
+            transform: scale(0.98);
+        }
+        .card-ghost {
+            background: #e0f2fe !important;
+            border: 2px dashed #0369a1 !important;
+        }
+        .dark .card-ghost {
+            background: #0c4a6e !important;
+            border: 2px dashed #38bdf8 !important;
+        }
+
+        /* Priority Colors */
+        .prio-alta { @apply bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400; }
+        .prio-media { @apply bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400; }
+        .prio-baja { @apply bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+        }
+        .dark ::-webkit-scrollbar-thumb { background: #374151; }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-enter { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        /* Input highlight */
+        .focus-input:focus {
+            @apply ring-2 ring-brand-500/20 border-brand-500 outline-none;
+        }
+
+        /* Layout overlays */
+        #sidebar-overlay { 
+            display: none;
+        }
+        @media (max-width: 1023px) {
+            #sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                z-index: 50;
+            }
+            #sidebar.open {
+                transform: translateX(0);
+            }
+            #sidebar-overlay.open {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-500/30">
+
+    <div id="app" class="flex h-screen overflow-hidden bg-surface-50 dark:bg-surface-950">
+        
+        <!-- Sidebar -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 w-72 lg:relative lg:block glass border-r z-40">
+            <div class="flex flex-col h-full bg-white/50 dark:bg-surface-900/50">
+                
+                <!-- Brand -->
+                <div class="p-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-2xl bg-brand-600 flex items-center justify-center shadow-lg shadow-brand-500/20">
+                            <i data-lucide="zap" class="text-white w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h1 class="font-display font-extrabold text-xl tracking-tight text-surface-900 dark:text-white uppercase italic">TaskFlow</h1>
+                            <p class="text-[10px] font-medium text-surface-400 tracking-wider">TEAM SYNC PRO</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="flex-1 px-4 py-2 space-y-1 overflow-y-auto">
+                    <div class="mb-4">
+                        <p class="px-4 text-[10px] font-bold text-surface-400 uppercase tracking-widest mb-2">Principal</p>
+                        <button onclick="router.navigate('dashboard')" id="nav-dashboard" class="nav-link w-full">
+                            <i data-lucide="grid" class="w-5 h-5"></i> Dashboard
+                        </button>
+                        <button onclick="router.navigate('kanban')" id="nav-kanban" class="nav-link w-full">
+                            <i data-lucide="layout" class="w-5 h-5"></i> Kanban
+                        </button>
+                        <button onclick="router.navigate('list')" id="nav-list" class="nav-link w-full">
+                            <i data-lucide="list-checks" class="w-5 h-5"></i> Listado
+                        </button>
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="px-4 text-[10px] font-bold text-surface-400 uppercase tracking-widest mb-2">Equipo</p>
+                        <button onclick="router.navigate('team')" id="nav-team" class="nav-link w-full">
+                            <i data-lucide="users" class="w-5 h-5"></i> Miembros
+                        </button>
+                        <button onclick="router.navigate('metrics')" id="nav-metrics" class="nav-link w-full">
+                            <i data-lucide="bar-chart-2" class="w-5 h-5"></i> Rendimiento
+                        </button>
+                    </div>
+                </nav>
+
+                <!-- Footer Sidebar -->
+                <div class="p-4 border-t border-surface-200 dark:border-surface-800">
+                    <button onclick="ui.modals.task.open()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-semibold text-sm transition-all shadow-lg shadow-brand-500/20 active:scale-95">
+                        <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                        Nueva Tarea
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Sidebar Mobile Overlay -->
+        <div id="sidebar-overlay" onclick="ui.sidebar.toggle(false)" class="fixed inset-0 bg-surface-950/40 backdrop-blur-sm z-30"></div>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col min-w-0 bg-surface-50 dark:bg-[#020617] overflow-hidden">
+            
+            <!-- Topbar (Minimal) -->
+            <header class="h-16 flex items-center justify-between px-6 bg-white/50 dark:bg-surface-900/50 border-b backdrop-blur-md z-20">
+                <div class="flex items-center gap-4">
+                    <button onclick="ui.sidebar.toggle(true)" class="lg:hidden p-2 text-surface-500 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                    <div id="view-title" class="hidden md:block">
+                        <h2 class="font-display font-bold text-lg text-surface-900 dark:text-white">Dashboard</h2>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <!-- Search Bar -->
+                    <div class="relative hidden sm:block">
+                        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400"></i>
+                        <input type="text" id="global-search" oninput="app.handleSearch(this.value)" placeholder="Buscar tareas..." class="w-64 pl-9 pr-4 py-1.5 bg-surface-100 dark:bg-surface-800 border-transparent rounded-full text-sm focus:ring-2 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-surface-900 transition-all">
+                    </div>
+
+                    <div class="h-6 w-px bg-surface-200 dark:bg-surface-800 mx-1"></div>
+
+                    <!-- Theme Toggle -->
+                    <button onclick="ui.theme.toggle()" class="p-2 text-surface-500 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-full transition-all">
+                        <i data-lucide="moon" class="dark:hidden w-5 h-5"></i>
+                        <i data-lucide="sun" class="hidden dark:block w-5 h-5 text-amber-400"></i>
+                    </button>
+
+                    <!-- Profile Dropdown (Mockup) -->
+                    <div class="flex items-center gap-2 pl-2">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xs ring-2 ring-offset-2 ring-brand-500/10">
+                            DS
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div id="dynamic-content" class="flex-1 overflow-y-auto p-4 lg:p-8">
+                <!-- Views will be injected here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals & Overlays -->
+    <div id="modal-layer" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
+        <div id="modal-backdrop" class="absolute inset-0 bg-surface-950/50 backdrop-blur-md opacity-0 transition-opacity"></div>
+        <div id="modal-container" class="relative w-full max-w-xl scale-95 opacity-0 transition-all duration-300">
+            <!-- Modal content injected -->
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-layer" class="fixed bottom-6 right-6 z-[100] flex flex-col gap-3"></div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        /**
+         * CONFIGURACIÓN DE FIREBASE
+         * Sustituye los datos de abajo por los de tu consola de Firebase
+         */
+        const firebaseConfig = {
+            apiKey: "AIzaSyBAWD5BJ4hRxqSoVnf0mumHIoZnTeL8pag",
+            authDomain: "taskflow-pro-9add4.firebaseapp.com",
+            projectId: "taskflow-pro-9add4",
+            storageBucket: "taskflow-pro-9add4.firebasestorage.app",
+            messagingSenderId: "21743971186",
+            appId: "1:21743971186:web:bfda0e7d0f6427a392cbeb",
+            measurementId: "G-9WBBD03YDK"
+        };
+
+        // Inicializar Firebase (solo si los datos no son los placeholders)
+        let db = null;
+        if (firebaseConfig.apiKey !== "TU_API_KEY") {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+        }
+
+        /**
+         * TaskFlow - Application Engine
+         */
+
+        // 1. Data Store & State (Ahora con Firebase)
+        const store = {
+            data: {
+                tasks: [],
+                team: [
+                    { id: 1, name: 'David S.', role: 'Project Manager', initials: 'DS', color: 'bg-indigo-600' },
+                    { id: 2, name: 'Elena R.', role: 'Frontend Developer', initials: 'ER', color: 'bg-emerald-600' },
+                    { id: 3, name: 'Marc B.', role: 'UI/UX Designer', initials: 'MB', color: 'bg-rose-600' },
+                    { id: 4, name: 'Lucas P.', role: 'Backend Dev', initials: 'LP', color: 'bg-amber-600' }
+                ],
+                tags: ['Diseño', 'Desarrollo', 'Urgente', 'Feedback', 'Bug'],
+                theme: 'light'
+            },
+            
+            async init() {
+                if (!db) {
+                    console.warn("Firebase no configurado. Usando localStorage como backup.");
+                    this.loadLocal();
+                    return;
+                }
+
+                // Escuchar cambios en tiempo real desde Firestore
+                db.collection("tasks").onSnapshot((querySnapshot) => {
+                    const tasks = [];
+                    querySnapshot.forEach((doc) => {
+                        tasks.push({ _fs_id: doc.id, ...doc.data() });
+                    });
+                    this.data.tasks = tasks;
+                    
+                    // Solo renderizar si estamos en la vista adecuada para no romper inputs
+                    if (router.current !== 'team') router.render();
+                });
+
+                // Cargar equipo si quieres que también esté en la nube (opcional)
+                // db.collection("team").onSnapshot(...)
+            },
+
+            loadLocal() {
+                const saved = localStorage.getItem('taskflow_pro_local');
+                if (saved) {
+                    this.data = JSON.parse(saved);
+                } else {
+                    this.seedLocal();
+                }
+            },
+
+            saveLocal() {
+                localStorage.setItem('taskflow_pro_local', JSON.stringify(this.data));
+            },
+
+            seedLocal() {
+                this.data.tasks = [
+                    { id: 101, title: 'Refactorizar Auth Service', desc: 'Migrar a JWT con Refresh Tokens', status: 'todo', prio: 'alta', date: '2025-05-10', assignee: 4, tags: ['Desarrollo'] },
+                    { id: 102, title: 'Diseño Landing Page', desc: 'Figma prototypes for v2', status: 'doing', prio: 'media', date: '2025-05-15', assignee: 3, tags: ['Diseño'] }
+                ];
+                this.saveLocal();
+            }
+        };
+
+        // 2. UI Controller
+        const ui = {
+            theme: {
+                init() {
+                    const isDark = store.data.theme === 'dark' || 
+                        (!store.data.theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                    document.documentElement.classList.toggle('dark', isDark);
+                },
+                toggle() {
+                    const isDark = document.documentElement.classList.toggle('dark');
+                    store.data.theme = isDark ? 'dark' : 'light';
+                    store.save();
+                }
+            },
+            sidebar: {
+                toggle(show) {
+                    const sidebar = document.getElementById('sidebar');
+                    const overlay = document.getElementById('sidebar-overlay');
+                    sidebar.classList.toggle('open', show);
+                    overlay.classList.toggle('open', show);
+                }
+            },
+            toast(msg, type = 'success') {
+                const container = document.getElementById('toast-layer');
+                const t = document.createElement('div');
+                const id = 'toast-' + Date.now();
+                t.id = id;
+                t.className = `flex items-center gap-3 px-5 py-3 rounded-2xl glass shadow-2xl border-l-4 transition-all duration-300 translate-x-12 opacity-0
+                    ${type === 'success' ? 'border-brand-500' : 'border-red-500'}`;
+                
+                const icon = type === 'success' ? 'check-circle' : 'alert-circle';
+                t.innerHTML = `
+                    <div class="flex-shrink-0 ${type === 'success' ? 'text-brand-500' : 'text-red-500'}">
+                        <i data-lucide="${icon}" class="w-5 h-5"></i>
+                    </div>
+                    <p class="text-sm font-medium text-surface-800 dark:text-surface-200">${msg}</p>
+                `;
+                
+                container.appendChild(t);
+                lucide.createIcons();
+                
+                setTimeout(() => { t.classList.remove('translate-x-12', 'opacity-0'); }, 10);
+                setTimeout(() => {
+                    t.classList.add('translate-x-12', 'opacity-0');
+                    setTimeout(() => t.remove(), 300);
+                }, 4000);
+            },
+            modals: {
+                task: {
+                    open(taskId = null) {
+                        const task = taskId ? store.data.tasks.find(t => t.id == taskId) : null;
+                        const layer = document.getElementById('modal-layer');
+                        const container = document.getElementById('modal-container');
+                        const backdrop = document.getElementById('modal-backdrop');
+                        
+                        layer.classList.remove('hidden');
+                        
+                        const title = task ? 'Editar Tarea' : 'Nueva Tarea';
+                        container.innerHTML = `
+                            <div class="glass dark:bg-surface-900 border overflow-hidden rounded-3xl shadow-2xl">
+                                <div class="px-8 py-6 border-b flex items-center justify-between">
+                                    <h3 class="font-display font-bold text-xl">${title}</h3>
+                                    <button onclick="ui.modals.close()" class="p-2 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-full transition-all">
+                                        <i data-lucide="x" class="w-6 h-6"></i>
+                                    </button>
+                                </div>
+                                <form id="task-form" onsubmit="app.handleTaskSubmit(event, ${taskId})" class="p-8 space-y-6">
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label class="block text-[10px] font-bold uppercase tracking-widest text-surface-400 mb-2">Nombre de la tarea</label>
+                                            <input type="text" name="title" required value="${task?.title || ''}" placeholder="Ej: Fix login bug" 
+                                                class="w-full px-4 py-3 glass rounded-2xl border-none focus-input text-lg font-medium">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-bold uppercase tracking-widest text-surface-400 mb-2">Descripción</label>
+                                            <textarea name="desc" rows="3" placeholder="Detalles de la tarea..." 
+                                                class="w-full px-4 py-3 glass rounded-2xl border-none focus-input resize-none">${task?.desc || ''}</textarea>
+                                        </div>
+                                        
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase tracking-widest text-surface-400 mb-2">Responsable</label>
+                                                <select name="assignee" class="w-full px-4 py-3 glass rounded-2xl border-none focus-input">
+                                                    ${store.data.team.map(m => `<option value="${m.id}" ${task?.assignee == m.id ? 'selected' : ''}>${m.name}</option>`).join('')}
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase tracking-widest text-surface-400 mb-2">Prioridad</label>
+                                                <select name="prio" class="w-full px-4 py-3 glass rounded-2xl border-none focus-input">
+                                                    <option value="baja" ${task?.prio == 'baja' ? 'selected' : ''}>Baja</option>
+                                                    <option value="media" ${task?.prio == 'media' ? 'selected' : ''}>Media</option>
+                                                    <option value="alta" ${task?.prio == 'alta' ? 'selected' : ''}>Alta</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase tracking-widest text-surface-400 mb-2">Estado</label>
+                                                <select name="status" class="w-full px-4 py-3 glass rounded-2xl border-none focus-input">
+                                                    <option value="todo" ${task?.status == 'todo' ? 'selected' : ''}>Por hacer</option>
+                                                    <option value="doing" ${task?.status == 'doing' ? 'selected' : ''}>En curso</option>
+                                                    <option value="review" ${task?.status == 'review' ? 'selected' : ''}>Revisión</option>
+                                                    <option value="done" ${task?.status == 'done' ? 'selected' : ''}>Finalizado</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase tracking-widest text-surface-400 mb-2">Fecha límite</label>
+                                                <input type="date" name="date" required value="${task?.date || ''}" 
+                                                    class="w-full px-4 py-3 glass rounded-2xl border-none focus-input">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex gap-4 pt-4">
+                                        ${task ? `<button type="button" onclick="app.deleteTask(${task.id})" class="flex-1 px-4 py-3 text-red-500 hover:bg-red-500/10 rounded-2xl font-bold transition-all">Eliminar</button>` : ''}
+                                        <button type="submit" class="flex-[2] bg-brand-600 hover:bg-brand-700 text-white rounded-2xl py-3 font-bold transition-all shadow-xl shadow-brand-500/20 active:scale-[0.98]">
+                                            ${task ? 'Guardar Cambios' : 'Crear Tarea'}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        `;
+                        
+                        lucide.createIcons();
+                        setTimeout(() => {
+                            backdrop.classList.add('opacity-100');
+                            container.classList.remove('scale-95', 'opacity-0');
+                        }, 50);
+                    }
+                },
+                close() {
+                    const layer = document.getElementById('modal-layer');
+                    const container = document.getElementById('modal-container');
+                    const backdrop = document.getElementById('modal-backdrop');
+                    
+                    backdrop.classList.remove('opacity-100');
+                    container.classList.add('scale-95', 'opacity-0');
+                    setTimeout(() => layer.classList.add('hidden'), 300);
+                }
+            }
+        };
+
+        // 3. Routing & Views
+        const router = {
+            current: 'dashboard',
+            navigate(view) {
+                this.current = view;
+                this.updateUI();
+                this.render();
+                ui.sidebar.toggle(false);
+            },
+            updateUI() {
+                // Update nav classes
+                document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+                const activeLink = document.getElementById('nav-' + this.current);
+                if (activeLink) activeLink.classList.add('active');
+                
+                // Update header title
+                document.getElementById('view-title').innerHTML = `<h2 class="font-display font-bold text-lg text-surface-900 dark:text-white capitalize">${this.current}</h2>`;
+            },
+            render() {
+                const target = document.getElementById('dynamic-content');
+                target.innerHTML = `<div class="animate-enter h-full">${views[this.current]()}</div>`;
+                lucide.createIcons();
+
+                // View specific logic
+                if (this.current === 'kanban') app.initKanban();
+                if (this.current === 'dashboard') app.initDashboard();
+            }
+        };
+
+        // 4. View Templates
+        const views = {
+            dashboard: () => {
+                const stats = app.getStats();
+                return `
+                    <div class="space-y-8">
+                        <div>
+                            <h2 class="font-display font-black text-3xl tracking-tight mb-2">¡Hola, David! 👋</h2>
+                            <p class="text-surface-500 font-medium">Aquí está el resumen del progreso de tu equipo.</p>
+                        </div>
+
+                        <!-- Stats Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+                            <div class="glass p-6 rounded-3xl group hover:shadow-xl transition-all cursor-pointer" onclick="router.navigate('list')">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="w-12 h-12 rounded-2xl bg-brand-500/10 flex items-center justify-center text-brand-600 group-hover:scale-110 transition-transform">
+                                        <i data-lucide="layers" class="w-6 h-6"></i>
+                                    </div>
+                                    <span class="text-[10px] font-bold text-brand-500 bg-brand-500/10 px-2 py-1 rounded-full">+12%</span>
+                                </div>
+                                <h3 class="text-3xl font-black text-surface-900 dark:text-white mb-1">${stats.total}</h3>
+                                <p class="text-sm font-semibold text-surface-400">Tareas Activas</p>
+                            </div>
+
+                            <div class="glass p-6 rounded-3xl group hover:shadow-xl transition-all">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-600">
+                                        <i data-lucide="clock" class="w-6 h-6"></i>
+                                    </div>
+                                </div>
+                                <h3 class="text-3xl font-black text-surface-900 dark:text-white mb-1">${stats.doing}</h3>
+                                <p class="text-sm font-semibold text-surface-400">En Curso</p>
+                            </div>
+
+                            <div class="glass p-6 rounded-3xl group hover:shadow-xl transition-all">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                                        <i data-lucide="check-circle" class="w-6 h-6"></i>
+                                    </div>
+                                </div>
+                                <h3 class="text-3xl font-black text-surface-900 dark:text-white mb-1">${stats.done}</h3>
+                                <p class="text-sm font-semibold text-surface-400">Finalizadas</p>
+                            </div>
+
+                            <div class="glass p-6 rounded-3xl border-red-500/20 group hover:shadow-xl transition-all">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="w-12 h-12 rounded-2xl bg-red-500/10 flex items-center justify-center text-red-600">
+                                        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                                    </div>
+                                </div>
+                                <h3 class="text-3xl font-black text-surface-900 dark:text-white mb-1">${stats.overdue}</h3>
+                                <p class="text-sm font-semibold text-surface-400">Tareas Vencidas</p>
+                            </div>
+                        </div>
+
+                        <!-- Progress Section -->
+                        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                            <div class="xl:col-span-2 glass rounded-[2rem] p-8">
+                                <div class="flex items-center justify-between mb-8">
+                                    <h3 class="font-display font-bold text-xl">Progreso por Estado</h3>
+                                    <div class="flex gap-2">
+                                        <div class="flex items-center gap-2 text-xs font-medium text-surface-400">
+                                            <span class="w-2 h-2 rounded-full bg-brand-500"></span> Proyectos
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="h-80 w-full">
+                                    <canvas id="dashboard-chart"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="glass rounded-[2rem] p-8">
+                                <h3 class="font-display font-bold text-xl mb-6">Urgentes 🔥</h3>
+                                <div class="space-y-4">
+                                    ${store.data.tasks.filter(t => t.prio === 'alta' && t.status !== 'done').slice(0, 4).map(t => `
+                                        <div class="p-4 bg-surface-50 dark:bg-surface-800/50 rounded-2xl border border-surface-200 dark:border-surface-800 cursor-pointer" onclick="ui.modals.task.open(${t.id})">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <span class="text-[10px] font-bold text-red-500 bg-red-500/10 px-2 py-0.5 rounded-full uppercase tracking-tighter">Urgente</span>
+                                                <span class="text-[10px] text-surface-400 font-medium">${t.date}</span>
+                                            </div>
+                                            <h4 class="font-bold text-sm text-surface-900 dark:text-white truncate">${t.title}</h4>
+                                        </div>
+                                    `).join('')}
+                                    ${store.data.tasks.filter(t => t.prio === 'alta' && t.status !== 'done').length === 0 ? '<p class="text-center text-sm py-8 text-surface-400">Todo bajo control ✨</p>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+            kanban: () => {
+                const cols = [
+                    { id: 'todo', title: 'Pendiente', color: 'bg-surface-200 dark:bg-surface-800' },
+                    { id: 'doing', title: 'En Curso', color: 'bg-brand-500' },
+                    { id: 'review', title: 'Revisión', color: 'bg-indigo-500' },
+                    { id: 'done', title: 'Completado', color: 'bg-emerald-500' }
+                ];
+                return `
+                    <div class="h-full flex flex-col">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="font-display font-black text-3xl">Flujo de Trabajo</h2>
+                            <div class="flex gap-2">
+                                <button onclick="app.refresh()" class="p-2 glass rounded-xl hover:bg-surface-100 transition-all"><i data-lucide="refresh-cw" class="w-5 h-5"></i></button>
+                            </div>
+                        </div>
+                        <div class="flex-1 flex gap-6 overflow-x-auto pb-4 custom-scroll">
+                            ${cols.map(c => `
+                                <div class="flex-shrink-0 w-80 flex flex-col rounded-[2rem] glass- border-none">
+                                    <div class="flex items-center justify-between p-4 mb-2">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-3 h-3 rounded-full ${c.color}"></div>
+                                            <h3 class="font-bold text-surface-900 dark:text-white uppercase tracking-widest text-xs">${c.title}</h3>
+                                        </div>
+                                        <span class="px-2 py-1 text-[10px] font-bold bg-surface-100 dark:bg-surface-800 rounded-lg text-surface-500">${store.data.tasks.filter(t => t.status === c.id).length}</span>
+                                    </div>
+                                    <div id="col-${c.id}" class="kanban-col flex-1 p-2 space-y-3" data-status="${c.id}">
+                                        ${store.data.tasks.filter(t => t.status === c.id).map(t => app.renderCard(t)).join('')}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            },
+            list: () => `
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <h2 class="font-display font-black text-3xl">Todas las Tareas</h2>
+                        <div class="flex gap-2">
+                            <select onchange="app.sortList(this.value)" class="glass px-4 py-2 rounded-xl text-xs font-bold border-none outline-none">
+                                <option value="date">Ordenar por Fecha</option>
+                                <option value="prio">Ordenar por Prioridad</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="glass overflow-hidden rounded-[2rem]">
+                        <table class="w-full text-left">
+                            <thead class="bg-surface-100 dark:bg-surface-800/50 text-[10px] font-black uppercase tracking-widest text-surface-400">
+                                <tr>
+                                    <th class="px-8 py-4">Tarea</th>
+                                    <th class="px-6 py-4">Prioridad</th>
+                                    <th class="px-6 py-4">Asignado</th>
+                                    <th class="px-6 py-4">Fecha</th>
+                                    <th class="px-6 py-4">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y dark:divide-surface-800">
+                                ${store.data.tasks.map(t => {
+                                    const m = store.data.team.find(tm => tm.id == t.assignee);
+                                    return `
+                                        <tr class="hover:bg-brand-500/5 transition-colors cursor-pointer" onclick="ui.modals.task.open(${t.id})">
+                                            <td class="px-8 py-5">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-1.5 h-1.5 rounded-full ${t.prio === 'alta' ? 'bg-red-500' : t.prio === 'media' ? 'bg-amber-500' : 'bg-emerald-500'}"></div>
+                                                    <span class="font-bold text-surface-900 dark:text-white">${t.title}</span>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-5">
+                                                <span class="prio-${t.prio} px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight">${t.prio}</span>
+                                            </td>
+                                            <td class="px-6 py-5">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-7 h-7 rounded-full ${m.color} flex items-center justify-center text-white text-[10px] font-bold">${m.initials}</div>
+                                                    <span class="text-sm font-medium">${m.name}</span>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-5 text-sm font-medium text-surface-500">${t.date}</td>
+                                            <td class="px-6 py-5">
+                                                <span class="text-[10px] font-bold text-surface-400 uppercase">${t.status}</span>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `,
+            team: () => `
+                <div class="space-y-8">
+                    <div class="flex items-center justify-between">
+                        <h2 class="font-display font-black text-3xl">Nuestro Equipo</h2>
+                        <button class="bg-surface-900 dark:bg-surface-100 text-white dark:text-surface-900 px-6 py-3 rounded-2xl font-bold text-sm">Añadir Miembro</button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        ${store.data.team.map(m => `
+                            <div class="glass p-8 rounded-[2rem] text-center group hover:shadow-2xl transition-all">
+                                <div class="w-20 h-20 mx-auto rounded-3xl ${m.color} flex items-center justify-center text-white text-3xl font-black mb-6 shadow-xl relative">
+                                    ${m.initials}
+                                    <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 border-4 border-white dark:border-surface-900 rounded-full"></div>
+                                </div>
+                                <h3 class="font-display font-bold text-xl text-surface-900 dark:text-white">${m.name}</h3>
+                                <p class="text-sm font-medium text-surface-400 mb-6">${m.role}</p>
+                                <div class="flex justify-center gap-4 border-t pt-6 dark:border-surface-800">
+                                    <div class="text-center">
+                                        <p class="text-lg font-black">${store.data.tasks.filter(t => t.assignee == m.id).length}</p>
+                                        <p class="text-[10px] font-bold text-surface-400">Total</p>
+                                    </div>
+                                    <div class="w-px bg-surface-200 dark:bg-surface-800"></div>
+                                    <div class="text-center">
+                                        <p class="text-lg font-black">${store.data.tasks.filter(t => t.assignee == m.id && t.status == 'done').length}</p>
+                                        <p class="text-[10px] font-bold text-surface-400">Hechas</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `,
+            metrics: () => `
+                <div class="h-full flex items-center justify-center text-surface-400 italic">
+                    Vista de rendimiento en desarrollo... 🚀
+                </div>
+            `
+        };
+
+        // 5. Application Core Logic
+        const app = {
+            async init() {
+                ui.theme.init();
+                await store.init();
+                router.navigate('dashboard');
+                console.log('TaskFlow Pro initialized');
+            },
+
+            refresh() { router.render(); },
+
+            getStats() {
+                const now = new Date();
+                return {
+                    total: store.data.tasks.length,
+                    doing: store.data.tasks.filter(t => t.status === 'doing').length,
+                    done: store.data.tasks.filter(t => t.status === 'done').length,
+                    overdue: store.data.tasks.filter(t => t.status !== 'done' && new Date(t.date) < now).length
+                };
+            },
+
+            initDashboard() {
+                const ctx = document.getElementById('dashboard-chart');
+                if (!ctx) return;
+                
+                const labels = ['Pendiente', 'En Curso', 'Revisión', 'Finalizado'];
+                const counts = ['todo', 'doing', 'review', 'done'].map(s => store.data.tasks.filter(t => t.status === s).length);
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: counts,
+                            backgroundColor: ['#d1d5db', '#0ea5e9', '#6366f1', '#10b981'],
+                            borderRadius: 12,
+                            barThickness: 45
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { display: false }, ticks: { color: '#9ca3af' } },
+                            x: { grid: { display: false }, ticks: { color: '#9ca3af' } }
+                        }
+                    }
+                });
+            },
+
+            initKanban() {
+                ['todo', 'doing', 'review', 'done'].forEach(status => {
+                    const el = document.getElementById('col-' + status);
+                    new Sortable(el, {
+                        group: 'tasks',
+                        animation: 250,
+                        ghostClass: 'card-ghost',
+                        dragClass: 'card-drag',
+                        onEnd: (e) => {
+                            const taskId = e.item.dataset.id;
+                            const newStatus = e.to.dataset.status;
+                            this.updateTaskStatus(taskId, newStatus);
+                        }
+                    });
+                });
+            },
+
+            renderCard(t) {
+                const m = store.data.team.find(tm => tm.id == t.assignee);
+                const isOverdue = new Date(t.date) < new Date() && t.status !== 'done';
+                return `
+                    <div data-id="${t.id}" onclick="ui.modals.task.open(${t.id})" class="p-5 glass border shadow-sm rounded-3xl cursor-grab active:cursor-grabbing hover:shadow-xl transition-all hover:scale-[1.01] group">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="prio-${t.prio} inline-block px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-tight">${t.prio}</span>
+                            <div class="flex gap-1">
+                                ${t.tags?.map(tag => `<span class="w-1.5 h-1.5 rounded-full bg-brand-500/50"></span>`).join('')}
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-surface-900 dark:text-white mb-2 leading-tight">${t.title}</h4>
+                        <p class="text-xs text-surface-500 mb-4 line-clamp-2">${t.desc}</p>
+                        <div class="flex items-center justify-between border-t border-surface-100 dark:border-surface-800 pt-3">
+                           <div class="flex items-center gap-1.5 ${isOverdue ? 'text-red-500' : 'text-surface-400'}">
+                                <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                                <span class="text-[10px] font-bold">${t.date}</span>
+                           </div>
+                           <div class="w-7 h-7 rounded-full ${m.color} flex items-center justify-center text-white text-[10px] font-bold shadow-lg ring-2 ring-white dark:ring-surface-900">${m.initials}</div>
+                        </div>
+                    </div>
+                `;
+            },
+
+            async updateTaskStatus(id, status) {
+                const task = store.data.tasks.find(t => t.id == id);
+                if (task) {
+                    if (db) {
+                        try {
+                            await db.collection("tasks").doc(task._fs_id).update({ status: status });
+                            ui.toast(`Tarea movida a ${status}`);
+                        } catch (e) {
+                            ui.toast("Error al actualizar en la nube", "error");
+                        }
+                    } else {
+                        task.status = status;
+                        store.saveLocal();
+                        ui.toast(`Tarea movida a ${status}`);
+                        router.render();
+                    }
+                }
+            },
+
+            async handleTaskSubmit(e, taskId) {
+                e.preventDefault();
+                const fd = new FormData(e.target);
+                const obj = {
+                    title: fd.get('title'),
+                    desc: fd.get('desc'),
+                    prio: fd.get('prio'),
+                    status: fd.get('status'),
+                    assignee: parseInt(fd.get('assignee')),
+                    date: fd.get('date'),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                if (db) {
+                    try {
+                        if (taskId) {
+                            const task = store.data.tasks.find(t => t.id == taskId);
+                            await db.collection("tasks").doc(task._fs_id).update(obj);
+                            ui.toast('Cambios guardados en la nube');
+                        } else {
+                            obj.id = Date.now();
+                            obj.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                            await db.collection("tasks").add(obj);
+                            ui.toast('¡Tarea creada en la nube!');
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        ui.toast("Error de conexión", "error");
+                    }
+                } else {
+                    // Fallback Local
+                    if (taskId) {
+                        const idx = store.data.tasks.findIndex(t => t.id == taskId);
+                        store.data.tasks[idx] = { ...store.data.tasks[idx], ...obj };
+                    } else {
+                        obj.id = Date.now();
+                        store.data.tasks.unshift(obj);
+                    }
+                    store.saveLocal();
+                    router.render();
+                    ui.toast('Guardado localmente');
+                }
+
+                ui.modals.close();
+            },
+
+            async deleteTask(id) {
+                if (confirm('¿Eliminar tarea definitivamente?')) {
+                    if (db) {
+                        const task = store.data.tasks.find(t => t.id == id);
+                        await db.collection("tasks").doc(task._fs_id).delete();
+                        ui.toast('Tarea eliminada de la nube', 'error');
+                    } else {
+                        store.data.tasks = store.data.tasks.filter(t => t.id != id);
+                        store.saveLocal();
+                        router.render();
+                        ui.toast('Tarea eliminada localmente', 'error');
+                    }
+                    ui.modals.close();
+                }
+            },
+
+            handleSearch(val) {
+                // Temporary search filter logic in state
+                const term = val.toLowerCase();
+                // This would ideally affect the rendering in the current view
+                // For now, let's just log or implement a simple filter for the list view if we are there
+                if (router.current === 'list') {
+                    router.render(); // List view template already uses task list
+                }
+            }
+        };
+
+        // Execution Start
+        window.onload = () => app.init();
+    </script>
+</body>
+</html>
