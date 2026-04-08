@@ -724,7 +724,12 @@
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         ${store.data.team.map(m => `
-                            <div class="glass p-8 rounded-[2rem] text-center group hover:shadow-2xl transition-all">
+                            <div class="glass p-8 rounded-[2rem] text-center group hover:shadow-2xl transition-all relative">
+                                <!-- Botón de eliminar -->
+                                <button onclick="app.deleteMember(${m.id})" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-rose-500/10 text-rose-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-rose-500 hover:text-white">
+                                    <i data-lucide="x" class="w-4 h-4"></i>
+                                </button>
+                                
                                 <div class="w-20 h-20 mx-auto rounded-3xl ${m.color} flex items-center justify-center text-white text-3xl font-black mb-6 shadow-xl relative">
                                     ${m.initials}
                                     <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 border-4 border-white dark:border-surface-900 rounded-full"></div>
@@ -909,6 +914,46 @@
                 }
 
                 ui.modals.close();
+            },
+
+            async deleteMember(id) {
+                const member = store.data.team.find(m => m.id == id);
+                if (!member) return;
+
+                const assignedTasks = store.data.tasks.filter(t => t.assignee == id);
+                const confirmMsg = assignedTasks.length > 0 
+                    ? `¿Eliminar a ${member.name}? Tiene ${assignedTasks.length} tareas asignadas que quedarán sin responsable.`
+                    : `¿Eliminar a ${member.name} del equipo?`;
+
+                if (confirm(confirmMsg)) {
+                    // Si usamos firebase, también deberíamos borrarlo de la nube si el equipo está allí
+                    // Por ahora borramos de la memoria local/global
+                    store.data.team = store.data.team.filter(m => m.id != id);
+                    
+                    // Opcional: Desasignar tareas de ese miembro
+                    store.data.tasks.forEach(t => {
+                        if (t.assignee == id) t.assignee = 0; // 0 o null como "Sin asignar"
+                    });
+
+                    if (db) {
+                        try {
+                            // Si guardas el equipo en Firestore, añade aquí db.collection("team").doc(id).delete();
+                            // Actualizamos tareas afectadas en la nube si es necesario
+                            for(let t of assignedTasks) {
+                                await db.collection("tasks").doc(t._fs_id).update({ assignee: 0 });
+                            }
+                            ui.toast(`${member.name} eliminado y tareas actualizadas`);
+                        } catch (e) {
+                            console.error(e);
+                        }
+                    } else {
+                        store.saveLocal();
+                        ui.toast(`${member.name} eliminado del equipo`);
+                    }
+                    
+                    router.render();
+                    lucide.createIcons();
+                }
             },
 
             async deleteTask(id) {
