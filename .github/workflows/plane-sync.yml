@@ -1,0 +1,30 @@
+name: Sync PR to Plane
+
+on:
+  pull_request:
+    types: [opened, closed, reopened]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify n8n
+        run: |
+          curl -X POST https://tareasn8n.slabs.studio/webhook/github-pr \
+            -H "Content-Type: application/json" \
+            -d '{
+              "action": "${{ github.event.action }}",
+              "pull_request": {
+                "number": ${{ github.event.pull_request.number }},
+                "title": "${{ github.event.pull_request.title }}",
+                "body": "${{ github.event.pull_request.body }}",
+                "merged": ${{ github.event.pull_request.merged || false }},
+                "html_url": "${{ github.event.pull_request.html_url }}",
+                "user": {
+                  "login": "${{ github.event.pull_request.user.login }}"
+                }
+              },
+              "repository": {
+                "full_name": "${{ github.repository }}"
+              }
+            }'
