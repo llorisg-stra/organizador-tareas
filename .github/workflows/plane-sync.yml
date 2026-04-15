@@ -1,1 +1,33 @@
-name: Sync PR to Plane\n\non:\n  pull_request:\n    types: [opened, closed, reopened]\n\njobs:\n  sync:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Notify n8n\n        env:\n          PR_TITLE: ${{ github.event.pull_request.title }}\n          PR_ACTION: ${{ github.event.action }}\n          PR_NUMBER: ${{ github.event.pull_request.number }}\n          PR_MERGED: ${{ github.event.pull_request.merged }}\n          PR_URL: ${{ github.event.pull_request.html_url }}\n          PR_USER: ${{ github.event.pull_request.user.login }}\n          REPO_NAME: ${{ github.repository }}\n        run: |\n          # Build JSON safely using jq\n          JSON=$(jq -n \\\n            --arg action \"$PR_ACTION\" \\\n            --arg title \"$PR_TITLE\" \\\n            --argjson number \"$PR_NUMBER\" \\\n            --argjson merged \"${PR_MERGED:-false}\" \\\n            --arg url \"$PR_URL\" \\\n            --arg user \"$PR_USER\" \\\n            --arg repo \"$REPO_NAME\" \\\n            '{\n              action: $action,\n              pull_request: {\n                number: $number,\n                title: $title,\n                merged: $merged,\n                html_url: $url,\n                user: { login: $user }\n              },\n              repository: { full_name: $repo }\n            }')\n          \n          echo \"Sending to n8n: $JSON\"\n          \n          curl -sf -X POST https://tareasn8n.slabs.studio/webhook/github-pr \\\n            -H \"Content-Type: application/json\" \\\n            -d \"$JSON\" || echo \"Webhook call completed (may have no response body)\"\n
+name: Sync PR to Plane
+
+on:
+  pull_request:
+    types: [opened, closed, reopened]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify n8n
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_ACTION: ${{ github.event.action }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_MERGED: ${{ github.event.pull_request.merged }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_USER: ${{ github.event.pull_request.user.login }}
+          REPO_NAME: ${{ github.repository }}
+        run: |
+          JSON=$(jq -n \
+            --arg action "$PR_ACTION" \
+            --arg title "$PR_TITLE" \
+            --argjson number "$PR_NUMBER" \
+            --argjson merged "${PR_MERGED:-false}" \
+            --arg url "$PR_URL" \
+            --arg user "$PR_USER" \
+            --arg repo "$REPO_NAME" \
+            '{action: $action, pull_request: {number: $number, title: $title, merged: $merged, html_url: $url, user: {login: $user}}, repository: {full_name: $repo}}')
+          echo "Sending: $JSON"
+          curl -sf -X POST https://tareasn8n.slabs.studio/webhook/github-pr \
+            -H "Content-Type: application/json" \
+            -d "$JSON" || echo "Done"
