@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flujo de Gestión de Proyectos — Strategia Labs</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-color: #0f1115;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent-primary: #3b82f6;
+            --accent-hover: #2563eb;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+            --code-bg: #0b0f19;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background-color: var(--card-bg);
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+        }
+
+        h1, h2, h3 {
+            color: #ffffff;
+            margin-top: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+        }
+
+        .meta-box {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid var(--accent-primary);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-muted);
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            font-family: 'Courier New', Courier, monospace;
+            color: #a5b4fc;
+        }
+
+        code {
+            background-color: var(--code-bg);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            color: #93c5fd;
+            font-size: 0.9em;
+        }
+
+        pre code {
+            padding: 0;
+            background-color: transparent;
+            color: inherit;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .diagram {
+            font-size: 0.9rem;
+            line-height: 1.2;
+            color: #fbbf24;
+        }
+        
+        ul {
+            margin-bottom: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: var(--border-color);
+            margin: 3rem 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>📋 Flujo de Gestión de Proyectos — Strategia Labs</h1>
+
+        <div class="meta-box">
+            <strong>Versión:</strong> 1.0 <br>
+            <strong>Fecha:</strong> 16 de abril de 2026 <br>
+            <strong>Equipo:</strong> Gabi, David, Cristian, Nayara
+        </div>
+
+        <h2>🎯 Visión General</h2>
+        <p>Cada iniciativa que nace en Strategia Labs sigue un flujo estructurado que conecta la planificación local con Plane (gestor de tareas), GitHub (código) y Teams (comunicación).</p>
+        <p><strong>El principio fundamental:</strong> todo proyecto empieza como un documento aquí, se divide en hitos con fechas, se empuja a Plane como issues rastreables, y se cierra cuando todos los hitos están completados.</p>
+
+        <pre class="diagram"><code>┌─────────────┐    ┌──────────────┐    ┌───────────┐    ┌──────────┐
+│  1. IDEA    │ →  │  2. PLAN     │ →  │ 3. PLANE  │ →  │ 4. HACER │
+│  (Concepto) │    │  (Documento) │    │ (Issues)  │    │(Ejecutar)│
+└─────────────┘    └──────────────┘    └───────────┘    └──────────┘
+                                                              │
+┌─────────────┐    ┌──────────────┐    ┌───────────┐          │
+│  7. CERRAR  │ ←  │ 6. VERIFICAR │ ←  │  5. CHECK │ ←───────┘
+│  (Archivar) │    │  (Revisar)   │    │(Progreso) │
+└─────────────┘    └──────────────┘    └───────────┘</code></pre>
+
+        <hr>
+
+        <h2>📖 Las 7 Fases</h2>
+
+        <h3>Fase 1: IDEA — Nace la iniciativa</h3>
+        <p>Cualquier miembro del equipo propone una iniciativa. Puede ser:</p>
+        <ul>
+            <li>Una migración (email, Passbolt, VPS...)</li>
+            <li>Un proyecto nuevo (web, app, producto...)</li>
+            <li>Una mejora operativa (automatización, optimización...)</li>
+        </ul>
+        <p><strong>Resultado:</strong> Una frase clara que describe qué se quiere conseguir.</p>
+        <p><strong>Ejemplo:</strong> <em>"Migrar el dominio de email de @strategialabs.eu a @slabs.studio"</em></p>
+
+        <h3>Fase 2: PLAN — Se documenta y estructura</h3>
+        <p>El agente (Antigravity) crea un <strong>plan de implementación</strong> con toda la información necesaria para ejecutar el proyecto.</p>
+
+        <h4>Archivo: <code>proyectos/{nombre-proyecto}/plan.md</code></h4>
+        <pre><code>proyectos/
+├── migrar-email-slabs/
+│   ├── plan.md              ← Plan detallado
+│   ├── task.md              ← Checklist de seguimiento
+│   └── notas/               ← Capturas, docs auxiliares
+├── migrar-passbolt/
+│   ├── plan.md
+│   ├── ...</code></pre>
+
+        <p><strong>Contenido del <code>plan.md</code>:</strong> resumen, datos del proyecto, hitos con fechas, riesgos y criterios de éxito.</p>
+
+        <h3>Fase 3: PLANE — Se crean los issues</h3>
+        <p>Una vez aprobado el plan, el agente crea <strong>un issue por hito</strong> en Plane:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Campo Issue</th>
+                    <th>Valor</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Título</strong></td>
+                    <td><code>[Proyecto] Hito X: Nombre del hito</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Estado</strong></td>
+                    <td><code>Backlog</code> → <code>In Progress</code> → <code>Done</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Etiqueta</strong></td>
+                    <td>Según el tipo (infra, desarrollo...)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Fase 4: HACER — Se ejecuta el trabajo</h3>
+        <p>Durante la ejecución, cada sesión actualiza el <code>task.md</code> local con el progreso.</p>
+
+        <pre><code>- [x] Hito 1: Agregar dominio en M365
+- [/] Hito 2: Configurar DNS Cloudflare
+- [ ] Hito 3: Crear alias para el equipo</code></pre>
+
+        <h3>Fase 5: MARCAR — Se actualiza el progreso</h3>
+        <p>Cuando un hito se completa: <code>task.md</code> [x] ──→ Plane (Done) ──→ Teams (notificación)</p>
+
+        <h3>Fase 6: VERIFICAR — Se revisa que todo funciona</h3>
+        <p>Antes de cerrar el proyecto, se prueban las funcionalidades y se revisa la documentación (<code>CONTEXT.md</code>, etc.).</p>
+
+        <h3>Fase 7: CERRAR — Se archiva el proyecto</h3>
+        <p>Cuando todos los hitos están <code>Done</code>, se marca todo como finalizado y la carpeta del proyecto se mantiene como referencia.</p>
+
+        <hr>
+
+        <h2>🔗 Conexiones del Ecosistema</h2>
+
+        <pre class="diagram"><code>                    ┌─────────────────┐
+                    │   ANTIGRAVITY   │
+                    └────────┬────────┘
+                             │
+     ┌───────────────┬───────┴───────┬───────────────┐
+     │               │               │               │
+┌────▼────┐     ┌────▼────┐     ┌────▼────┐     ┌────▼────┐
+│  LOCAL  │     │  PLANE  │     │ GITHUB  │     │  TEAMS  │
+│(task.md)│     │(Issues) │     │(Código) │     │(Alertas)│
+└─────────┘     └─────────┘     └─────────┘     └─────────┘</code></pre>
+
+        <h3>¿Qué se automatiza? (vía n8n)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Evento</th>
+                    <th>Acción automática</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>PR en GitHub</td>
+                    <td>→ Issue en Plane se mueve a <code>In Progress</code></td>
+                </tr>
+                <tr>
+                    <td>PR mergeado</td>
+                    <td>→ Issue en Plane se mueve a <code>Done</code></td>
+                </tr>
+                <tr>
+                    <td>Issue cambia estado (Plane)</td>
+                    <td>→ Notificación en Teams</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr>
+
+        <h2>⚡ Comandos Rápidos</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Acción</th>
+                    <th>Cómo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Iniciar proyecto</td>
+                    <td><em>"Crea un proyecto para [nombre]"</em></td>
+                </tr>
+                <tr>
+                    <td>Ver progreso</td>
+                    <td><em>"¿Cómo va el proyecto [nombre]?"</em> o <code>/tareas</code></td>
+                </tr>
+                <tr>
+                    <td>Ver roadmap general</td>
+                    <td><code>/mapa</code></td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+</body>
+</html>

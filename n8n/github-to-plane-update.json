@@ -1,0 +1,178 @@
+{
+  "name": "github-to-plane",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "github-pr",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 0],
+      "id": "070f134e-a389-483a-a337-81d843be51e2",
+      "name": "Webhook",
+      "webhookId": "fd27a94e-460a-4606-939e-b510052713a1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json.body || $input.first().json;\nconst title = data.pull_request.title || '';\nconst action = data.action || '';\nconst merged = data.pull_request.merged || false;\nconst prUrl = data.pull_request.html_url || '';\nconst author = data.pull_request.user ? data.pull_request.user.login : 'unknown';\nconst match = title.match(/SLABS-(\\d+)/i);\nif (!match) { return [{json: {skip: true, reason: 'No SLABS-XX found'}}]; }\nlet targetState = '';\nlet emoji = '';\nlet statusText = '';\nif (action === 'opened' || action === 'reopened') {\n  targetState = 'f4397648-02c5-463f-b113-468943c84bfc';\n  emoji = '🚀';\n  statusText = 'In Progress';\n} else if (action === 'closed' && merged) {\n  targetState = '19806a67-b62f-43b5-b860-7bf4a19e2ce2';\n  emoji = '✅';\n  statusText = 'Done';\n} else if (action === 'closed' && !merged) {\n  targetState = 'd5ba1fc8-8502-404b-a437-92469a63a5d3';\n  emoji = '❌';\n  statusText = 'Backlog';\n} else {\n  return [{json: {skip: true, reason: 'Unknown action'}}];\n}\nreturn [{json: {skip: false, issueSequence: match[1], targetState: targetState, prUrl: prUrl, emoji: emoji, statusText: statusText, author: author, title: title, action: action}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [208, 0],
+      "id": "2fda74fc-9222-463c-a3b0-7a6e4dead9f8",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9c368aaa-ca1c-4052-8899-6968d2667d86",
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [416, 0],
+      "id": "f4e88bbb-60bc-44e1-8d85-5f4160f76f0c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "=http://51.77.202.96:8000/api/v1/workspaces/s-labs/projects/29d315de-30b3-4393-af5e-f3f937e6ffe0/issues/",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "search",
+              "value": "={{ $('Code').first().json.issueSequence }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "plane_api_9513bfb2e0d24d35a6cdb23e88216134"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [624, 0],
+      "id": "e27498aa-d543-444a-95ab-12ddc24672f0",
+      "name": "Search Issue"
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = $input.first().json.results || [];\nconst seqId = parseInt($('Code').first().json.issueSequence);\nconst targetState = $('Code').first().json.targetState;\nconst prUrl = $('Code').first().json.prUrl;\nconst issue = results.find(i => i.sequence_id === seqId);\nif (!issue) {\n  return [{ json: { skip: true, reason: 'Issue SLABS-' + seqId + ' not found' } }];\n}\nreturn [{ json: { issueId: issue.id, targetState: targetState, prUrl: prUrl, currentName: issue.name } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [832, 0],
+      "id": "9acabe36-6b72-4f2e-8710-1f21fe9d9aa3",
+      "name": "Extract Issue"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=http://51.77.202.96:8000/api/v1/workspaces/s-labs/projects/29d315de-30b3-4393-af5e-f3f937e6ffe0/issues/{{ $json.issueId }}/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "plane_api_9513bfb2e0d24d35a6cdb23e88216134"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"state\": \"{{ $json.targetState }}\"}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [1040, 0],
+      "id": "43c17e6a-1193-4f9c-b75b-67a45660aa20",
+      "name": "Update Issue"
+    },
+    {
+      "parameters": {
+        "resource": "channelMessage",
+        "teamId": {
+          "__rl": true,
+          "value": "3a629f45-b3f0-49e8-9180-e634250e2aa0",
+          "mode": "id"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "19:f79ad614c65a428cb4407515b79e4977@thread.tacv2",
+          "mode": "id"
+        },
+        "contentType": "html",
+        "message": "={{ $('Code').first().json.emoji }} <strong>SLABS-{{ $('Code').first().json.issueSequence }}</strong> → {{ $('Code').first().json.statusText }}<br><br>📋 {{ $('Code').first().json.title }}<br>👤 {{ $('Code').first().json.author }}<br>🔗 <a href=\"{{ $('Code').first().json.prUrl }}\">Ver PR</a>"
+      },
+      "type": "n8n-nodes-base.microsoftTeams",
+      "typeVersion": 2,
+      "position": [1248, 0],
+      "id": "b1c2d3e4-f5a6-7890-abcd-ef1234567890",
+      "name": "Notify Teams",
+      "credentials": {
+        "microsoftTeamsOAuth2Api": {
+          "id": "3EgTlEWOlKcNOalf",
+          "name": "Microsoft Teams account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{"node": "Code", "type": "main", "index": 0}]]
+    },
+    "Code": {
+      "main": [[{"node": "If", "type": "main", "index": 0}]]
+    },
+    "If": {
+      "main": [[{"node": "Search Issue", "type": "main", "index": 0}]]
+    },
+    "Search Issue": {
+      "main": [[{"node": "Extract Issue", "type": "main", "index": 0}]]
+    },
+    "Extract Issue": {
+      "main": [[{"node": "Update Issue", "type": "main", "index": 0}]]
+    },
+    "Update Issue": {
+      "main": [[{"node": "Notify Teams", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

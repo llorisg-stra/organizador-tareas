@@ -1,0 +1,221 @@
+﻿{
+    "data":  {
+                 "updatedAt":  "2026-04-16T21:57:03.549Z",
+                 "createdAt":  "2026-04-16T18:36:50.129Z",
+                 "id":  "JzW46ruUKlsPlUaW",
+                 "name":  "Plane a Teams (Operaciones)",
+                 "description":  null,
+                 "active":  true,
+                 "isArchived":  false,
+                 "nodes":  [
+                               {
+                                   "parameters":  {
+                                                      "httpMethod":  "POST",
+                                                      "path":  "plane-to-teams",
+                                                      "options":  {
+
+                                                                  }
+                                                  },
+                                   "type":  "n8n-nodes-base.webhook",
+                                   "typeVersion":  2.1,
+                                   "position":  [
+                                                    0,
+                                                    0
+                                                ],
+                                   "id":  "9a358e7a-450b-4bb1-98a3-2845bbfc444c",
+                                   "name":  "Webhook",
+                                   "webhookId":  "1760ae99-0271-4466-868c-0317381eee75"
+                               },
+                               {
+                                   "parameters":  {
+                                                      "resource":  "channelMessage",
+                                                      "teamId":  {
+                                                                     "__rl":  true,
+                                                                     "value":  "3a629f45-b3f0-49e8-9180-e634250e2aa0",
+                                                                     "mode":  "id"
+                                                                 },
+                                                      "channelId":  {
+                                                                        "__rl":  true,
+                                                                        "value":  "19:d07762c26b254b6bb3bc076926a3d769@thread.tacv2",
+                                                                        "mode":  "id"
+                                                                    },
+                                                      "contentType":  "html",
+                                                      "message":  "=\u003cb\u003eTarea Completada\u003c/b\u003e\u003cbr\u003e\u003cbr\u003e\u003cb\u003eTarea:\u003c/b\u003e SLABS-{{ $json.body.data.sequence_id }} - {{ $json.body.data.name }}\u003cbr\u003e\u003cb\u003eEstado:\u003c/b\u003e {{ $json.body.data.state.name }}\u003cbr\u003e\u003cb\u003ePrioridad:\u003c/b\u003e {{ $json.body.data.priority }}",
+                                                      "options":  {
+
+                                                                  }
+                                                  },
+                                   "type":  "n8n-nodes-base.microsoftTeams",
+                                   "typeVersion":  2,
+                                   "position":  [
+                                                    208,
+                                                    0
+                                                ],
+                                   "id":  "72046588-4e19-4bb2-a1b6-542fd696d750",
+                                   "name":  "Create message",
+                                   "webhookId":  "03ad48aa-029a-4e27-acc1-a7a2b5fbd3bf",
+                                   "credentials":  {
+                                                       "microsoftTeamsOAuth2Api":  {
+                                                                                       "id":  "3EgTlEWOlKcNOalf",
+                                                                                       "name":  "Microsoft Teams account"
+                                                                                   }
+                                                   }
+                               }
+                           ],
+                 "connections":  {
+                                     "Webhook":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "Create message",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 }
+                                 },
+                 "settings":  {
+                                  "executionOrder":  "v1",
+                                  "binaryMode":  "separate"
+                              },
+                 "staticData":  null,
+                 "meta":  {
+                              "templateCredsSetupCompleted":  true
+                          },
+                 "pinData":  {
+
+                             },
+                 "versionId":  "071afcf7-a031-41f5-a14b-5ec184c1d998",
+                 "activeVersionId":  "071afcf7-a031-41f5-a14b-5ec184c1d998",
+                 "versionCounter":  23,
+                 "triggerCount":  1,
+                 "shared":  [
+                                {
+                                    "updatedAt":  "2026-04-16T18:36:50.133Z",
+                                    "createdAt":  "2026-04-16T18:36:50.133Z",
+                                    "role":  "workflow:owner",
+                                    "workflowId":  "JzW46ruUKlsPlUaW",
+                                    "projectId":  "pMk7ydc8OaJEd94V",
+                                    "project":  {
+                                                    "updatedAt":  "2026-04-13T12:44:01.368Z",
+                                                    "createdAt":  "2026-04-13T10:50:35.097Z",
+                                                    "id":  "pMk7ydc8OaJEd94V",
+                                                    "name":  "David Coroando \u003cdavid@strategialabs.eu\u003e",
+                                                    "type":  "personal",
+                                                    "icon":  null,
+                                                    "description":  null,
+                                                    "creatorId":  "d16009fb-e1ed-4ad3-b69e-53473a024802"
+                                                }
+                                }
+                            ],
+                 "tags":  [
+
+                          ],
+                 "parentFolder":  null,
+                 "activeVersion":  {
+                                       "updatedAt":  "2026-04-16T21:57:31.000Z",
+                                       "createdAt":  "2026-04-16T21:57:03.550Z",
+                                       "versionId":  "071afcf7-a031-41f5-a14b-5ec184c1d998",
+                                       "workflowId":  "JzW46ruUKlsPlUaW",
+                                       "nodes":  [
+                                                     {
+                                                         "parameters":  {
+                                                                            "httpMethod":  "POST",
+                                                                            "path":  "plane-to-teams",
+                                                                            "options":  {
+
+                                                                                        }
+                                                                        },
+                                                         "type":  "n8n-nodes-base.webhook",
+                                                         "typeVersion":  2.1,
+                                                         "position":  [
+                                                                          0,
+                                                                          0
+                                                                      ],
+                                                         "id":  "9a358e7a-450b-4bb1-98a3-2845bbfc444c",
+                                                         "name":  "Webhook",
+                                                         "webhookId":  "1760ae99-0271-4466-868c-0317381eee75"
+                                                     },
+                                                     {
+                                                         "parameters":  {
+                                                                            "resource":  "channelMessage",
+                                                                            "teamId":  {
+                                                                                           "__rl":  true,
+                                                                                           "value":  "3a629f45-b3f0-49e8-9180-e634250e2aa0",
+                                                                                           "mode":  "id"
+                                                                                       },
+                                                                            "channelId":  {
+                                                                                              "__rl":  true,
+                                                                                              "value":  "19:d07762c26b254b6bb3bc076926a3d769@thread.tacv2",
+                                                                                              "mode":  "id"
+                                                                                          },
+                                                                            "contentType":  "html",
+                                                                            "message":  "=\u003cb\u003eTarea Completada\u003c/b\u003e\u003cbr\u003e\u003cbr\u003e\u003cb\u003eTarea:\u003c/b\u003e SLABS-{{ $json.body.data.sequence_id }} - {{ $json.body.data.name }}\u003cbr\u003e\u003cb\u003eEstado:\u003c/b\u003e {{ $json.body.data.state.name }}\u003cbr\u003e\u003cb\u003ePrioridad:\u003c/b\u003e {{ $json.body.data.priority }}",
+                                                                            "options":  {
+
+                                                                                        }
+                                                                        },
+                                                         "type":  "n8n-nodes-base.microsoftTeams",
+                                                         "typeVersion":  2,
+                                                         "position":  [
+                                                                          208,
+                                                                          0
+                                                                      ],
+                                                         "id":  "72046588-4e19-4bb2-a1b6-542fd696d750",
+                                                         "name":  "Create message",
+                                                         "webhookId":  "03ad48aa-029a-4e27-acc1-a7a2b5fbd3bf",
+                                                         "credentials":  {
+                                                                             "microsoftTeamsOAuth2Api":  {
+                                                                                                             "id":  "3EgTlEWOlKcNOalf",
+                                                                                                             "name":  "Microsoft Teams account"
+                                                                                                         }
+                                                                         }
+                                                     }
+                                                 ],
+                                       "connections":  {
+                                                           "Webhook":  {
+                                                                           "main":  [
+                                                                                        [
+                                                                                            {
+                                                                                                "node":  "Create message",
+                                                                                                "type":  "main",
+                                                                                                "index":  0
+                                                                                            }
+                                                                                        ]
+                                                                                    ]
+                                                                       }
+                                                       },
+                                       "authors":  "David Coroando",
+                                       "name":  "Version 071afcf7",
+                                       "description":  "",
+                                       "autosaved":  true,
+                                       "workflowPublishHistory":  [
+                                                                      {
+                                                                          "createdAt":  "2026-04-16T21:57:31.203Z",
+                                                                          "id":  24,
+                                                                          "workflowId":  "JzW46ruUKlsPlUaW",
+                                                                          "versionId":  "071afcf7-a031-41f5-a14b-5ec184c1d998",
+                                                                          "event":  "activated",
+                                                                          "userId":  "d16009fb-e1ed-4ad3-b69e-53473a024802"
+                                                                      }
+                                                                  ]
+                                   },
+                 "scopes":  [
+                                "workflow:create",
+                                "workflow:delete",
+                                "workflow:execute",
+                                "workflow:execute-chat",
+                                "workflow:list",
+                                "workflow:move",
+                                "workflow:publish",
+                                "workflow:read",
+                                "workflow:share",
+                                "workflow:unpublish",
+                                "workflow:unshare",
+                                "workflow:update",
+                                "workflow:updateRedactionSetting"
+                            ],
+                 "checksum":  "99258c08608be1b6e5ad025bc046a9fd9d4bb7b5a05e6b0ebf5fd3136d883251"
+             }
+}

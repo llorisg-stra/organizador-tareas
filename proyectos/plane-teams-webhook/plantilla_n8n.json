@@ -1,0 +1,88 @@
+{
+  "name": "Plane a Teams (Operaciones)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "plane-a-teams",
+        "options": {}
+      },
+      "id": "84dbbb5f-1502-45e6-bdcf-88746c8200f6",
+      "name": "Webhook (Plane)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        860,
+        340
+      ],
+      "webhookId": "9b1fb45a-c5d0-45f6-b184-e8ab6fb9c22e"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.body.activity_type }}",
+              "value2": "issue.activity.updated"
+            }
+          ]
+        }
+      },
+      "id": "e0cf12f8-bdcd-4209-bed9-3739d2208a0d",
+      "name": "Es de Actualizacion?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "channelMessage",
+        "teamId": "",
+        "channelId": "",
+        "messageType": "html",
+        "message": "={{ '<b>✅ Tarea Terminada</b><br><br><b>📌 Tarea:</b> [' + $json.body.issue.identifier + '-' + $json.body.issue.sequence_id + '] ' + $json.body.issue.name }}"
+      },
+      "id": "93f41fc8-12c5-4aba-94f4-5f50af87acb0",
+      "name": "Avisar en Teams",
+      "type": "n8n-nodes-base.microsoftTeams",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        320
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook (Plane)": {
+      "main": [
+        [
+          {
+            "node": "Es de Actualizacion?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Es de Actualizacion?": {
+      "main": [
+        [
+          {
+            "node": "Avisar en Teams",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "versionId": "fced01c9-6b80-496e-a396-0348db4b4b2e"
+}

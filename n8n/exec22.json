@@ -1,0 +1,114 @@
+﻿{
+    "data":  {
+                 "id":  "22",
+                 "finished":  true,
+                 "mode":  "webhook",
+                 "retryOf":  null,
+                 "retrySuccessId":  null,
+                 "status":  "success",
+                 "createdAt":  "2026-04-16T22:03:14.061Z",
+                 "startedAt":  "2026-04-16T22:03:14.068Z",
+                 "stoppedAt":  "2026-04-16T22:03:14.673Z",
+                 "deletedAt":  null,
+                 "workflowId":  "JzW46ruUKlsPlUaW",
+                 "waitTill":  null,
+                 "storedAt":  "db",
+                 "data":  "[{\"version\":1,\"startData\":\"1\",\"resultData\":\"2\",\"executionData\":\"3\",\"resumeToken\":\"4\"},{},{\"runData\":\"5\",\"lastNodeExecuted\":\"6\"},{\"contextData\":\"7\",\"nodeExecutionStack\":\"8\",\"metadata\":\"9\",\"waitingExecution\":\"10\",\"waitingExecutionSource\":\"11\",\"runtimeData\":\"12\"},\"98a38494332a5dbf5ae73bd61e6ed7e7d17462b1401d2c00c54b71227a6daa26\",{\"Webhook\":\"13\",\"Create message\":\"14\"},\"Create message\",{},[],{},{},{},{\"version\":1,\"establishedAt\":1776376994081,\"source\":\"15\",\"redaction\":\"16\",\"triggerNode\":\"17\"},[\"18\"],[\"19\"],\"webhook\",{\"version\":1,\"policy\":\"20\"},{\"name\":\"21\",\"type\":\"22\"},{\"startTime\":1776376994084,\"executionIndex\":0,\"source\":\"23\",\"hints\":\"24\",\"executionTime\":2,\"executionStatus\":\"25\",\"data\":\"26\"},{\"startTime\":1776376994086,\"executionIndex\":1,\"source\":\"27\",\"hints\":\"28\",\"executionTime\":586,\"executionStatus\":\"25\",\"data\":\"29\"},\"none\",\"Webhook\",\"n8n-nodes-base.webhook\",[],[],\"success\",{\"main\":\"30\"},[\"31\"],[],{\"main\":\"32\"},[\"33\"],{\"previousNode\":\"21\",\"previousNodeOutput\":0,\"previousNodeRun\":0},[\"34\"],[\"35\"],[\"36\"],{\"json\":\"37\",\"pairedItem\":\"38\"},{\"json\":\"39\",\"pairedItem\":\"40\"},{\"headers\":\"41\",\"params\":\"42\",\"query\":\"43\",\"body\":\"44\",\"webhookUrl\":\"45\",\"executionMode\":\"46\"},{\"item\":0},{\"@odata.context\":\"47\",\"id\":\"48\",\"replyToId\":null,\"etag\":\"48\",\"messageType\":\"49\",\"createdDateTime\":\"50\",\"lastModifiedDateTime\":\"50\",\"lastEditedDateTime\":null,\"deletedDateTime\":null,\"subject\":null,\"summary\":null,\"chatId\":null,\"importance\":\"51\",\"locale\":\"52\",\"webUrl\":\"53\",\"onBehalfOf\":null,\"policyViolation\":null,\"eventDetail\":null,\"from\":\"54\",\"body\":\"55\",\"channelIdentity\":\"56\",\"attachments\":\"57\",\"mentions\":\"58\",\"reactions\":\"59\"},{\"item\":0},{\"connection\":\"60\",\"host\":\"61\",\"x-forwarded-scheme\":\"62\",\"x-forwarded-proto\":\"62\",\"x-forwarded-for\":\"63\",\"x-real-ip\":\"64\",\"content-length\":\"65\",\"accept\":\"66\",\"content-type\":\"67\",\"x-plane-signature\":\"68\",\"x-plane-event\":\"69\",\"cf-ray\":\"70\",\"x-plane-delivery\":\"71\",\"user-agent\":\"72\",\"accept-encoding\":\"73\",\"cdn-loop\":\"74\",\"cf-connecting-ip\":\"75\",\"cf-ipcountry\":\"76\",\"cf-visitor\":\"77\"},{},{},{\"event\":\"69\",\"action\":\"78\",\"webhook_id\":\"79\",\"workspace_id\":\"80\",\"data\":\"81\",\"activity\":\"82\"},\"https://tareasn8n.slabs.studio/webhook/plane-to-teams\",\"production\",\"https://graph.microsoft.com/beta/$metadata#teams(\u00273a629f45-b3f0-49e8-9180-e634250e2aa0\u0027)/channels(\u002719%3Ad07762c26b254b6bb3bc076926a3d769%40thread.tacv2\u0027)/messages/$entity\",\"1776376994380\",\"message\",\"2026-04-16T22:03:14.38Z\",\"normal\",\"en-us\",\"https://teams.microsoft.com/l/message/19%3Ad07762c26b254b6bb3bc076926a3d769%40thread.tacv2/1776376994380?groupId=3a629f45-b3f0-49e8-9180-e634250e2aa0\u0026tenantId=5c6c51ba-3898-4da2-a8aa-a0e8a089ada5\u0026createdTime=1776376994380\u0026parentMessageId=1776376994380\",{\"application\":null,\"device\":null,\"user\":\"83\"},{\"contentType\":\"84\",\"content\":\"85\"},{\"teamId\":\"86\",\"channelId\":\"87\"},[],[],[],\"Keep-Alive\",\"tareasn8n.slabs.studio\",\"https\",\"51.77.202.96, 172.71.164.186\",\"172.71.164.186\",\"1436\",\"*/*\",\"application/json\",\"7d48f414dedbe2f89307c35094d77dd64013010e26700afa40125dee84dd5271\",\"issue\",\"9ed67a949c9bd259-FRA\",\"2f3af3a9-f6a1-4bdf-8e87-9d4ce95c53ae\",\"Autopilot\",\"gzip, br\",\"cloudflare; loops=1\",\"51.77.202.96\",\"FR\",\"{\\\"scheme\\\":\\\"https\\\"}\",\"created\",\"4deaeea3-4814-405e-912d-9731b104d392\",\"ba0410ed-857d-4bf3-aa47-7adb7808fd03\",{\"id\":\"88\",\"labels\":\"89\",\"assignees\":\"90\",\"state\":\"91\",\"description\":\"92\",\"created_at\":\"93\",\"updated_at\":\"94\",\"deleted_at\":null,\"point\":null,\"name\":\"95\",\"description_json\":\"96\",\"description_html\":\"97\",\"description_stripped\":\"98\",\"description_binary\":null,\"priority\":\"99\",\"start_date\":null,\"target_date\":null,\"sequence_id\":16,\"sort_order\":105535,\"completed_at\":\"100\",\"archived_at\":null,\"is_draft\":false,\"external_source\":null,\"external_id\":null,\"created_by\":\"101\",\"updated_by\":null,\"project\":\"102\",\"workspace\":\"80\",\"parent\":null,\"estimate_point\":null,\"type\":null},{\"field\":null,\"new_value\":null,\"old_value\":null,\"actor\":\"103\",\"old_identifier\":null,\"new_identifier\":null},{\"@odata.type\":\"104\",\"id\":\"105\",\"displayName\":\"106\",\"userIdentityType\":\"107\",\"tenantId\":\"108\"},\"html\",\"\u003cb\u003eTarea Completada\u003c/b\u003e\u003cbr\u003e\\n\u003cbr\u003e\\n\u003cb\u003eTarea:\u003c/b\u003e SLABS-16 - Test v2: Notificacion dinamica con filtro\u003cbr\u003e\\n\u003cb\u003eEstado:\u003c/b\u003e Done\u003cbr\u003e\\n\u003cb\u003ePrioridad:\u003c/b\u003e medium\u003cbr\u003e\\n\u003cbr\u003e\\n\u003cem\u003e Powered by \u003ca href=\\\"https://tareasn8n.slabs.studio/workflow/JzW46ruUKlsPlUaW?utm_source=n8n-internal\u0026amp;utm_medium=powered_by\u0026amp;utm_campaign=n8n-nodes-base.microsoftTeams_1f1ecf31ebee150b44b89656a3b80b8aa5e7cb183e907951269278ddbf7c5bf1\\\"\u003ethis n8n workflow\u003c/a\u003e \u003c/em\u003e\",\"3a629f45-b3f0-49e8-9180-e634250e2aa0\",\"19:d07762c26b254b6bb3bc076926a3d769@thread.tacv2\",\"4c07dffe-2520-4e8a-9c04-e1d6087e539f\",[],[],{\"id\":\"109\",\"name\":\"110\",\"color\":\"111\",\"group\":\"112\"},{},\"2026-04-16T22:03:13.703156Z\",\"2026-04-16T22:03:13.674919Z\",\"Test v2: Notificacion dinamica con filtro\",{},\"\u003cp\u003e\u003c/p\u003e\",\"\",\"medium\",\"2026-04-16T22:03:13.658658Z\",\"1631811a-3d5d-4096-890b-6f94d3c17bed\",\"29d315de-30b3-4393-af5e-f3f937e6ffe0\",{\"id\":\"101\",\"first_name\":\"113\",\"last_name\":\"98\",\"email\":\"114\",\"avatar\":\"98\",\"avatar_url\":null,\"display_name\":\"115\"},\"#microsoft.graph.teamworkUserIdentity\",\"c17021db-3532-47bc-bfbe-334080d078e2\",\"Gabriel Lloris Serra\",\"aadUser\",\"5c6c51ba-3898-4da2-a8aa-a0e8a089ada5\",\"19806a67-b62f-43b5-b860-7bf4a19e2ce2\",\"Done\",\"#16A34A\",\"completed\",\"David\",\"david@strategialabs.eu\",\"david\"]",
+                 "workflowData":  {
+                                      "id":  "JzW46ruUKlsPlUaW",
+                                      "name":  "Plane a Teams (Operaciones)",
+                                      "active":  true,
+                                      "activeVersionId":  "071afcf7-a031-41f5-a14b-5ec184c1d998",
+                                      "isArchived":  false,
+                                      "createdAt":  "2026-04-16T18:36:50.129Z",
+                                      "updatedAt":  "2026-04-16T22:02:48.559Z",
+                                      "nodes":  [
+                                                    {
+                                                        "parameters":  {
+                                                                           "multipleMethods":  false,
+                                                                           "httpMethod":  "POST",
+                                                                           "path":  "plane-to-teams",
+                                                                           "authentication":  "none",
+                                                                           "responseMode":  "onReceived",
+                                                                           "contentTypeNotice":  "",
+                                                                           "options":  {
+
+                                                                                       }
+                                                                       },
+                                                        "type":  "n8n-nodes-base.webhook",
+                                                        "typeVersion":  2.1,
+                                                        "position":  [
+                                                                         0,
+                                                                         0
+                                                                     ],
+                                                        "id":  "9a358e7a-450b-4bb1-98a3-2845bbfc444c",
+                                                        "name":  "Webhook",
+                                                        "webhookId":  "1760ae99-0271-4466-868c-0317381eee75"
+                                                    },
+                                                    {
+                                                        "parameters":  {
+                                                                           "resource":  "channelMessage",
+                                                                           "operation":  "create",
+                                                                           "teamId":  {
+                                                                                          "__rl":  true,
+                                                                                          "value":  "3a629f45-b3f0-49e8-9180-e634250e2aa0",
+                                                                                          "mode":  "id"
+                                                                                      },
+                                                                           "channelId":  {
+                                                                                             "__rl":  true,
+                                                                                             "value":  "19:d07762c26b254b6bb3bc076926a3d769@thread.tacv2",
+                                                                                             "mode":  "id"
+                                                                                         },
+                                                                           "contentType":  "html",
+                                                                           "message":  "=\u003cb\u003eTarea Completada\u003c/b\u003e\u003cbr\u003e\u003cbr\u003e\u003cb\u003eTarea:\u003c/b\u003e SLABS-{{ $json.body.data.sequence_id }} - {{ $json.body.data.name }}\u003cbr\u003e\u003cb\u003eEstado:\u003c/b\u003e {{ $json.body.data.state.name }}\u003cbr\u003e\u003cb\u003ePrioridad:\u003c/b\u003e {{ $json.body.data.priority }}",
+                                                                           "options":  {
+
+                                                                                       }
+                                                                       },
+                                                        "type":  "n8n-nodes-base.microsoftTeams",
+                                                        "typeVersion":  2,
+                                                        "position":  [
+                                                                         208,
+                                                                         0
+                                                                     ],
+                                                        "id":  "72046588-4e19-4bb2-a1b6-542fd696d750",
+                                                        "name":  "Create message",
+                                                        "webhookId":  "03ad48aa-029a-4e27-acc1-a7a2b5fbd3bf",
+                                                        "credentials":  {
+                                                                            "microsoftTeamsOAuth2Api":  {
+                                                                                                            "id":  "3EgTlEWOlKcNOalf",
+                                                                                                            "name":  "Microsoft Teams account"
+                                                                                                        }
+                                                                        }
+                                                    }
+                                                ],
+                                      "connections":  {
+                                                          "Webhook":  {
+                                                                          "main":  [
+                                                                                       [
+                                                                                           {
+                                                                                               "node":  "Create message",
+                                                                                               "type":  "main",
+                                                                                               "index":  0
+                                                                                           }
+                                                                                       ]
+                                                                                   ]
+                                                                      }
+                                                      },
+                                      "settings":  {
+                                                       "executionOrder":  "v1",
+                                                       "binaryMode":  "separate"
+                                                   },
+                                      "staticData":  {
+
+                                                     },
+                                      "pinData":  {
+
+                                                  }
+                                  },
+                 "workflowVersionId":  "ae8e27be-0f6a-4e60-aeaf-7230fe9dde49",
+                 "customData":  {
+
+                                }
+             }
+}
